@@ -10,7 +10,7 @@ import {
 import { Public, GetCurrentUserId, GetCurrentUser } from '../common/decorators';
 import { RtGuard } from '../common/guards';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
+import { AuthDto, LoginDto } from './dto';
 import { Tokens } from './types';
 
 @Controller('auth')
@@ -18,29 +18,25 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @Post('local/signup')
-  @HttpCode(HttpStatus.CREATED)
+  @Post('/register')
   signupLocal(@Body() dto: AuthDto): Promise<Tokens> {
-    return this.authService.signupLocal(dto);
+    return this.authService.register(dto);
   }
 
   @Public()
-  @Post('local/signin')
-  @HttpCode(HttpStatus.OK)
-  signinLocal(@Body() dto: AuthDto): Promise<Tokens> {
-    return this.authService.signinLocal(dto);
+  @Post('/login')
+  signinLocal(@Body() dto: LoginDto): Promise<Tokens> {
+    return this.authService.login(dto);
   }
 
-  @Post('logout')
-  @HttpCode(HttpStatus.OK)
+  @Post('/logout')
   logout(@GetCurrentUserId() userId: number): Promise<boolean> {
     return this.authService.logout(userId);
   }
 
   @Public()
   @UseGuards(RtGuard)
-  @Post('refresh')
-  @HttpCode(HttpStatus.OK)
+  @Post('/refresh')
   refreshTokens(
     @GetCurrentUserId() userId: number,
     @GetCurrentUser('refreshToken') refreshToken: string,

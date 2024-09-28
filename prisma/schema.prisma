@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,14 +7,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Admin {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String
+  password String
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int          @id @default(autoincrement())
+  name         String       @default("")
+  email        String       @unique @default("")
+  avatar       String       @default("")
+  password     String       @default("")
+  theme        ThemeType    @default(LIGHT)
+  language     LanguageType @default(ENGLISH)
+  dateOfBirth  DateTime
+  isOnline     Boolean      @default(false)
+  refreshToken String       @default("")
+  packages     Package[]    @relation("userPackage")
+  hash         String       @default("")
+  hashedRt     String       @default("")
 
-  email    String  @unique
-  hash     String
-  hashedRt String?
+  @@index([id])
+}
 
-  @@map("users")
+model Package {
+  id            Int      @id @default(autoincrement())
+  title         String   @default("")
+  userId        Int
+  star          Int      @default(0)
+  important     Boolean  @default(false)
+  learnSchedule Boolean  @default(false)
+  items         String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation("userPackage", fields: [userId], references: [id])
+
+  @@index([id])
+}
+
+enum ThemeType {
+  LIGHT
+  DARK
+  HIGHTCONTRACT
+  SEPIA
+}
+
+enum LanguageType {
+  ENGLISH
+  VIETNAM
 }

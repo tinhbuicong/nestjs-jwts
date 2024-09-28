@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "hash" TEXT NOT NULL DEFAULT E'',
+ADD COLUMN     "hashedRt" TEXT NOT NULL DEFAULT E'';

@@ -5,7 +5,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import * as argon from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
 
-import { AuthDto } from './dto';
+import { AuthDto, LoginDto } from './dto';
 import { JwtPayload, Tokens } from './types';
 
 @Injectable()
@@ -16,14 +16,19 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async signupLocal(dto: AuthDto): Promise<Tokens> {
+  async register(dto: AuthDto): Promise<Tokens> {
     const hash = await argon.hash(dto.password);
 
     const user = await this.prisma.user
       .create({
         data: {
+          // ...dto,
           email: dto.email,
           hash,
+          password: hash,
+          name: dto.name,
+          avatar: dto.avatar,
+          dateOfBirth: new Date(dto.dateOfBirth),
         },
       })
       .catch((error) => {
@@ -41,7 +46,7 @@ export class AuthService {
     return tokens;
   }
 
-  async signinLocal(dto: AuthDto): Promise<Tokens> {
+  async login(dto: LoginDto): Promise<Tokens> {
     const user = await this.prisma.user.findUnique({
       where: {
         email: dto.email,
@@ -64,11 +69,11 @@ export class AuthService {
       where: {
         id: userId,
         hashedRt: {
-          not: null,
+          not: '',
         },
       },
       data: {
-        hashedRt: null,
+        hashedRt: '',
       },
     });
     return true;
